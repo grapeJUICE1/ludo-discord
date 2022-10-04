@@ -16,6 +16,7 @@ class Dice {
   }
   static async rollDice() {
     await this.waitForInput();
+
     let randNumFrom0to6 = Math.ceil(Math.random() * 5) + 1;
 
     if (randNumFrom0to6 === 6) {
