@@ -6,10 +6,10 @@ let data = {
       ["B1", "B2", "B3", "B4"],
       ["Y1", "Y2", "Y3", "Y4"],
     ],
-    Array(18).fill("  "),
-    Array(18).fill("  "),
-    Array(18).fill("  "),
-    Array(18).fill("  "),
+    Array(18).fill({ text: "     ", token: "  ", numOfTokens: 0 }),
+    Array(18).fill({ text: "     ", token: "  ", numOfTokens: 0 }),
+    Array(18).fill({ text: "     ", token: "  ", numOfTokens: 0 }),
+    Array(18).fill({ text: "     ", token: "  ", numOfTokens: 0 }),
   ],
 
   // specialBoardIndexes: {

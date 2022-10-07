@@ -63,9 +63,26 @@ class Board {
   }
   setBoardPiece(pos: number[], token: string) {
     if (pos.length === 3) {
-      this.board[pos[0]][pos[1]][pos[2]] = token;
+      this.board[pos[0]][pos[1]][pos[2]] = token === "     " ? "  " : token;
     } else {
-      this.board[pos[0]][pos[1]] = token;
+      let numOfTokens = 0;
+      let boardPiece = this.board[pos[0]][pos[1]];
+      if (token == "     ") {
+        numOfTokens = boardPiece.numOfTokens - 1;
+        console.log(numOfTokens + " sudani " + boardPiece.topMostToken);
+
+        if (numOfTokens) {
+          token = boardPiece.token;
+        } else {
+        }
+      } else {
+        numOfTokens = boardPiece.numOfTokens + 1;
+      }
+      this.board[pos[0]][pos[1]] = {
+        text: token === "     " ? token : `${token}+${numOfTokens - 1} `,
+        token,
+        numOfTokens,
+      };
     }
   }
 }
@@ -117,10 +134,8 @@ class Token {
     this.phase += 1;
   }
   moveToken(newPos: number[], board: Board) {
-    board.setBoardPiece(this.pos, "  ");
+    board.setBoardPiece(this.pos, "     ");
     this.pos = newPos;
-    // this.phase += changeSeq;
-
     board.setBoardPiece(this.pos, this.tokenName);
   }
 }
