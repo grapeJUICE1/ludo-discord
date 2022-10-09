@@ -331,17 +331,3 @@ class Game {
 
 const game = new Game();
 game.startGame();
-
-// gotta store tokens in a board point rip , seddd
-
-// ability to go to phase 5
-// cutting logic
-// safe places
-// leaderboard and game over
-// refactor the codebase and use typescript where necessary
-
-// ---- upto this is console part -----
-
-// time to make it to a bot
-// connect discord js
-// show the board for now
