@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "start": "ts-node src/index.ts",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev": "ts-node-dev --respawn --transpile-only --exit-child src/index.ts",
     "prod": "node dist/index.js"
   },
   "keywords": [],
@@ -16,7 +15,7 @@
     "discord.js": "^14.5.0",
     "dotenv": "^16.0.3",
     "glob": "^8.0.3",
-    "inquirer": "^9.1.2"
+    "inquirer": "^8.2.4"
   },
   "devDependencies": {
     "@types/glob": "^8.0.0",
