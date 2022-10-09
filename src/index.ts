@@ -61,28 +61,38 @@ class Board {
   printBoard() {
     printLudoBoard(this.board);
   }
-  setBoardPiece(pos: number[], token: string) {
-    if (pos.length === 3) {
-      this.board[pos[0]][pos[1]][pos[2]] = token === "     " ? "  " : token;
-    } else {
-      let numOfTokens = 0;
-      let boardPiece = this.board[pos[0]][pos[1]];
-      if (token == "     ") {
-        numOfTokens = boardPiece.numOfTokens - 1;
-        console.log(numOfTokens + " sudani " + boardPiece.topMostToken);
+  setBoardPiece(newPos: number[], token: Token) {
+    let [xOfOldPos, yOfOldPos, zOfOldPos] = token.pos;
 
-        if (numOfTokens) {
-          token = boardPiece.token;
-        } else {
-        }
-      } else {
-        numOfTokens = boardPiece.numOfTokens + 1;
-      }
-      this.board[pos[0]][pos[1]] = {
-        text: token === "     " ? token : `${token}+${numOfTokens - 1} `,
-        token,
-        numOfTokens,
-      };
+    if (zOfOldPos) {
+      this.board[xOfOldPos][yOfOldPos][zOfOldPos] = "  ";
+    } else {
+      let boardPiece = this.board[xOfOldPos][yOfOldPos];
+      boardPiece.tokens.splice(boardPiece.tokens.indexOf(token.tokenName));
+
+      boardPiece.text = boardPiece.tokens.length
+        ? `${boardPiece.tokens[0]}+${
+            boardPiece.tokens.length ? boardPiece.tokens.length - 1 : 0
+          }`
+        : "     ";
+      this.board[xOfOldPos][yOfOldPos] = boardPiece;
+    }
+
+    token.pos = newPos;
+    let [xOfNewPos, yOfNewPos, zOfNewPos] = newPos;
+    if (zOfNewPos) {
+      this.board[xOfNewPos][yOfNewPos][zOfNewPos] = token.tokenName;
+    } else {
+      let boardPiece = this.board[xOfNewPos][yOfNewPos];
+      console.log(boardPiece);
+      boardPiece.tokens.unshift(token.tokenName);
+      console.log(this.board[newPos[0]][newPos[1]]);
+      console.log(xOfOldPos + " " + yOfOldPos + " " + newPos);
+      let tokens = boardPiece.tokens;
+      let numOfTokens = boardPiece.tokens.length;
+      let text = `${token.tokenName}+${numOfTokens - 1} `;
+
+      this.board[xOfNewPos][yOfNewPos] = { text, tokens };
     }
   }
 }
@@ -97,14 +107,15 @@ class Player {
     this.color = color;
     for (let token in data[color]) {
       if (token !== "rootPos" && token !== "seq") {
-        this.tokens.push(
-          new Token(
-            token,
-            data[color][token],
-            data[color].rootPos,
-            data[color].seq
-          )
+        let newToken = new Token(
+          token,
+          data[color][token].start_pos,
+          data[color].rootPos,
+          data[color].seq,
+          data[color][token].end_pos
         );
+        Token.tokens.push(newToken);
+        this.tokens.push(newToken);
       }
     }
   }
@@ -113,9 +124,11 @@ class Player {
 class Token {
   tokenName: string;
   pos: number[];
+  endPos: number[];
   rootPosInYard: [number, number, number];
   rootPos: [number, number];
   phase: number = 0;
+  static tokens: Token[] = [];
   // 0 = in yard
   // 1 = 1st part
   // 2 = 2nd part
@@ -123,9 +136,10 @@ class Token {
   // 4 = 4th part
   // 5 = ripe
   phaseSeq: number;
-  constructor(token, pos, rootPos, phaseSeq) {
+  constructor(token, pos, rootPos, phaseSeq, endPos) {
     this.tokenName = token;
     this.pos = pos;
+    this.endPos = endPos;
     this.rootPosInYard = pos;
     this.rootPos = rootPos;
     this.phaseSeq = phaseSeq;
@@ -134,9 +148,9 @@ class Token {
     this.phase += 1;
   }
   moveToken(newPos: number[], board: Board) {
-    board.setBoardPiece(this.pos, "     ");
-    this.pos = newPos;
-    board.setBoardPiece(this.pos, this.tokenName);
+    // board.setBoardPiece(this.pos, "     ");
+    // this.pos = newPos;
+    board.setBoardPiece(newPos, this);
   }
 }
 
@@ -215,6 +229,7 @@ class Game {
 
     let x: number = chosenToken.pos[0];
     let y: number = chosenToken.pos[1];
+    let z: number = undefined;
 
     if (chosenToken.phase === 1) {
       if (y + diceVal > 5) {
@@ -240,12 +255,15 @@ class Game {
     } else if (chosenToken.phase === 4) {
       if (y + diceVal > 16) {
         chosenToken.goToNextPhase();
+        [x, y, z] = chosenToken.endPos;
       } else {
         y += diceVal;
       }
     }
 
-    chosenToken.moveToken([x, y], this.board);
+    z
+      ? chosenToken.moveToken([x, y, z], this.board)
+      : chosenToken.moveToken([x, y], this.board);
     printLudoBoard(data.board);
   }
   async playTurn(player: Player) {
@@ -297,7 +315,6 @@ class Game {
   }
   async startGame() {
     this.reset();
-    console.log(data.board);
     printLudoBoard(data.board);
     await this.getGameData();
 
@@ -314,3 +331,17 @@ class Game {
 
 const game = new Game();
 game.startGame();
+
+// gotta store tokens in a board point rip , seddd
+
+// ability to go to phase 5
+// cutting logic
+// safe places
+// leaderboard and game over
+// refactor the codebase and use typescript where necessary
+
+// ---- upto this is console part -----
+
+// time to make it to a bot
+// connect discord js
+// show the board for now
